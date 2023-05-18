@@ -99,7 +99,7 @@ app.get('/couponcause', (req: Request, res: Response, next: NextFunction) => {
 // https//coupontoaster.com
 app.get('/coupontoaster', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
-
+  const coupons : object[] = [];
   // puppeteer usage as normal
   puppeteer.launch({
     headless: false,
@@ -109,8 +109,28 @@ app.get('/coupontoaster', (req: Request, res: Response, next: NextFunction) => {
     console.log('Running tests..')
     const page = await browser.newPage()
     page.setDefaultNavigationTimeout(20 * 60 * 1000)
-    await page.goto('https://coupontoaster.com/doelashes')
-    
+    const targetUrl = 'https://coupontoaster.com/doelashes' 
+    await page.goto(targetUrl)
+   const links = await page.$$eval('.coupon .coupon-footer a', el => el.map(l => l.getAttribute('href')))
+    const ids = links.map(num => num?.split('/')[4])
+    for (const id of ids) {
+      await page.goto(`${targetUrl}?c=${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector(`.modal`)
+      // const coupon = elementHandle && await elementHandle.$eval('#div_1', code => (code as HTMLElement)?.innerText)
+      // coupons.push(coupon)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const element = document.querySelector('#div_1')
+        const couponCode = (element as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
     await browser.close()
     console.log(`All done, check the result. ✨`)
   })
