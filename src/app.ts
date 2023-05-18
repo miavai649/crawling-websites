@@ -73,6 +73,29 @@ app.get('/brokescholar', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//couponcause.com
+app.get('/couponcause', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    await page.goto('https://couponcause.com/stores/prima-lash-promo-codes/?_c=/')
+    const result = await page.$$eval('.tw-hidden .tw-relative .tw-bg-grey-lighter', el => el.map(code => (code as HTMLElement)?.innerText))
+    console.log("🚀 ~ file: app.ts:91 ~ app.get ~ result:", result)
+    await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 
