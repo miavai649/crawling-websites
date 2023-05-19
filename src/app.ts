@@ -231,6 +231,29 @@ app.get('/deala', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//dealspotr.com
+app.get('/dealspotr', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://dealspotr.com/promo-codes/doelashes.com' 
+    await page.goto(targetUrl)
+   const coupons = await page.$$eval('.pr.tar input', el => el.map(codes => codes.value))
+    console.log("🚀 ~ file: app.ts:249 ~ app.get ~ coupons:", coupons)
+    await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
