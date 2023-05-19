@@ -254,6 +254,30 @@ app.get('/dealspotr', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//epicsavers.com
+app.get('/epicsavers', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://epicsavers.com/store/doe-lashes' 
+    await page.goto(targetUrl)
+    const coupons = await page.$$eval('.top-right .button.getCode', el => el.map(code => code.getAttribute('coupon-code')))
+    console.log("🚀 ~ file: app.ts:272 ~ app.get ~ coupons:", coupons)
+    
+    await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
