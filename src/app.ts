@@ -303,6 +303,31 @@ app.get('/givingassistant', (req: Request, res: Response, next: NextFunction) =>
   res.send('Hello World!')
 })
 
+// https//gogetdeals.com
+app.get('/gogetdeals', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://gogetdeals.co.uk/store/doelashes-com' 
+    await page.goto(targetUrl)
+    const coupons = await page.$$eval('.peel-btn-wrap .peel-code p', el => el.map(code => (code as HTMLElement)?.innerText))
+    const filterCoupons = coupons.filter(code => code !== '')
+    console.log("🚀 ~ file: app.ts:322 ~ app.get ~ filterCoupons:", filterCoupons)
+    // console.log("🚀 ~ file: app.ts:321 ~ app.get ~ coupons:", coupons)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
