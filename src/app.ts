@@ -204,6 +204,33 @@ app.get('/couponseeker', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//deala.com
+app.get('/deala', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://deala.com/doe-baby' 
+    await page.goto(targetUrl)
+    await page.click('.btn-wrapper button')
+    const pages = await browser.pages()
+    // await page.goto(pages[2].url())
+    // const codes = await page.$$eval('.scroll-content .code-wrapper .code', el => el.map(code => (code as HTMLElement)?.innerText))
+    // console.log("🚀 ~ file: app.ts:223 ~ app.get ~ codes:", codes)
+    // await browser.close()
+    console.log(page.url());
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
