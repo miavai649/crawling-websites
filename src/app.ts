@@ -138,6 +138,45 @@ if(coupon?.couponCode) coupons.push(coupon)
   res.send('Hello World!')
 })
 
+// https//coupons.slickdeals.com
+app.get('/coupons.slickdeals', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://coupons.slickdeals.net/' 
+    await page.goto(targetUrl)
+    const links = await page.$$eval('.bp-c-card_content .bp-c-card_imageContainer.bp-c-link', el => el.map(link => link.getAttribute("href")))
+    const couponIdLinks = links.filter(l => l?.split('?').length === 2)
+    for (const link of couponIdLinks) {
+      await page.goto(`${link}`, {
+        waitUntil: 'networkidle0'
+      })
+      const elementHandle = await page.waitForSelector(`.bp-c-popup`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const element = document.querySelector('.bp-c-popup_content .bp-p-storeCouponModal_codeBlock .bp-p-storeCouponModal_code')
+        const couponCode = (element as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+    await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
