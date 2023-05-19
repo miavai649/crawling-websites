@@ -177,6 +177,33 @@ app.get('/coupons.slickdeals', (req: Request, res: Response, next: NextFunction)
   res.send('Hello World!')
 })
 
+// https//couponseeker.com
+app.get('/couponseeker', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://couponseeker.com/doe-lashes-promo-codes/' 
+    await page.goto(targetUrl)
+    await page.click('.input-code .right-0 .code')
+    const pages = await browser.pages()
+    await page.goto(pages[2].url())
+    const codes = await page.$$eval('.mt-4 .input-code input', el => el.map(code=> code.value))
+    const cupons = codes.filter(c => c !== '')
+    console.log("🚀 ~ file: app.ts:200 ~ app.get ~ cupons:", cupons)
+    await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
