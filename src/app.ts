@@ -363,6 +363,31 @@ app.get('/printfresh.knoji', (req: Request, res: Response, next: NextFunction) =
   res.send('Hello World!')
 })
 
+// https//refermatei.com
+app.get('/refermate', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : string[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://refermate.com/stores/doe-lashes-promo-codes' 
+    await page.goto(targetUrl)
+    const coupons = await page.$$eval('.right a', el => el.map(code => code.getAttribute('data-clipboard-text')))
+   const filterCode = coupons.filter(c => c !== null)
+     console.log("🚀 ~ file: app.ts:383 ~ app.get ~ filterCode:", filterCode)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
