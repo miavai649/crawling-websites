@@ -425,6 +425,36 @@ app.get('/couponbirds', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//couponchief.com
+app.get('/couponchief', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.couponchief.com/paradisefibers' 
+    await page.goto(targetUrl)
+    const couponId = await page.$$eval('.store-coupon', el => el.map(id => id.getAttribute("data-coupon-id")))
+    const filterId = couponId.filter(id => id !== null)
+    for (const id of filterId) {
+      await page.goto(`${targetUrl} #coupon=${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      console.log(page.url());
+    }
+    //  await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
