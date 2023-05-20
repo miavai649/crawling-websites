@@ -320,7 +320,42 @@ app.get('/gogetdeals', (req: Request, res: Response, next: NextFunction) => {
     const coupons = await page.$$eval('.peel-btn-wrap .peel-code p', el => el.map(code => (code as HTMLElement)?.innerText))
     const filterCoupons = coupons.filter(code => code !== '')
     console.log("🚀 ~ file: app.ts:322 ~ app.get ~ filterCoupons:", filterCoupons)
-    // console.log("🚀 ~ file: app.ts:321 ~ app.get ~ coupons:", coupons)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// https//printfresh.knoji.com
+app.get('/printfresh.knoji', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : string[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://printfresh.knoji.com/promo-codes/' 
+    await page.goto(targetUrl)
+    const links = await page.$$eval('.container300left__main .module', el => el.map(l => l.getAttribute('data-tab')))
+    const filterLInks = links.filter(l => l !== null)
+    for (const link of filterLInks) {
+      await page.goto(`${link}`, {
+        waitUntil: 'networkidle0'
+      })
+      const elementHandle = await page.waitForSelector(`.modal--wrap`)
+    const coupon = elementHandle && await elementHandle.$$eval('.modal2 input', el => el.map(c => c.getAttribute('value')))
+    coupon?.map(c => coupons.push(c as string))
+    }
+    const filterCoupons = coupons.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+   })
+     console.log("🚀 ~ file: app.ts:356 ~ app.get ~ filterCoupons:", filterCoupons)
      await browser.close()
     console.log(`All done, check the result. ✨`)
   })
