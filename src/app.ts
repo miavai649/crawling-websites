@@ -388,6 +388,43 @@ app.get('/refermate', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//couponbirds.com
+app.get('/couponbirds', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.couponbirds.com/codes/doelashes.com' 
+    await page.goto(targetUrl)
+    const links = await page.$$eval('.deal .deal-desc .get-code a', el => el.map(lin => lin.getAttribute('data-url')))
+    for (const link of links) {
+      await page.goto(`${link}`, {
+        waitUntil: 'networkidle0'
+      })
+      const elementHandle = await page.waitForSelector(`.modal`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = document.querySelector('#copy-code')?.getAttribute('value')
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 
 export default app
