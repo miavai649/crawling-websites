@@ -580,8 +580,8 @@ app.get('/discountreactor', (req: Request, res: Response, next: NextFunction) =>
   res.send('Hello World!')
 })
 
-// https//dontpayfull.com-------------------------------------------------------------------------------------------------------------
-app.get('/dontpayfull', (req: Request, res: Response, next: NextFunction) => {
+// https//emucoupon.com-------------------------------------------------------------------------------------------------------------
+app.get('/emucoupon', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
   // puppeteer usage as normal
@@ -593,19 +593,17 @@ app.get('/dontpayfull', (req: Request, res: Response, next: NextFunction) => {
     console.log('Running tests..')
     const page = await browser.newPage()
     page.setDefaultNavigationTimeout(20 * 60 * 1000)
-    const targetUrl = 'https://www.dontpayfull.com/at/printfresh.com' 
+    const targetUrl = 'https://www.emucoupon.com/code/doelashes' 
     await page.goto(targetUrl)
-    const ids = await page.$$eval('#active-coupons .code', el => el.map(id => id.getAttribute('data-id')))
-    const filterId = ids.filter(id => id !== null)
-    // console.log(filterId);
-    for (const id of filterId) {
-      await page.goto(`${targetUrl}?c=${id}#c${id}`, {
+    const ids = await page.$$eval('.container .col-9 .coupons', el => el.map(id => id.getAttribute('id')))
+    for (const id of ids) {
+      await page.goto(`${targetUrl}/${id}`, {
         waitUntil: 'networkidle0'
       })
-      console.log(page.url());
-      const elementHandle = await page.waitForSelector(`.floating-box-content`)
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector(`#contact`)
       const coupon = elementHandle && await elementHandle.evaluate(() => {
-        const couponCode =( document.querySelector('.offer-container .offer-code .code-box.code h2') as HTMLElement)?.innerText
+        const couponCode =document.querySelector('.codeboxbtn input')?.getAttribute('value')
         return {
           couponCode
         }
