@@ -580,5 +580,45 @@ app.get('/discountreactor', (req: Request, res: Response, next: NextFunction) =>
   res.send('Hello World!')
 })
 
+// https//dontpayfull.com-------------------------------------------------------------------------------------------------------------
+app.get('/dontpayfull', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.dontpayfull.com/at/printfresh.com' 
+    await page.goto(targetUrl)
+    const ids = await page.$$eval('#active-coupons .code', el => el.map(id => id.getAttribute('data-id')))
+    const filterId = ids.filter(id => id !== null)
+    // console.log(filterId);
+    for (const id of filterId) {
+      await page.goto(`${targetUrl}?c=${id}#c${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      console.log(page.url());
+      const elementHandle = await page.waitForSelector(`.floating-box-content`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode =( document.querySelector('.offer-container .offer-code .code-box.code h2') as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
