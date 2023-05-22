@@ -204,7 +204,7 @@ app.get('/couponseeker', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//deala.com
+// https//deala.com-------------------------------------------------------------------------------------------------------------------
 app.get('/deala', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   // puppeteer usage as normal
@@ -278,7 +278,7 @@ app.get('/epicsavers', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//givingassistant.com
+// https//givingassistant.com---------------------------------------------------------------------------------------------------------
 app.get('/givingassistant', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   // puppeteer usage as normal
@@ -425,7 +425,7 @@ app.get('/couponbirds', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//couponchief.com
+// https//couponchief.com-------------------------------------------------------------------------------------------------------------
 app.get('/couponchief', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -455,6 +455,106 @@ app.get('/couponchief', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//couponcode.com-------------------------------------------------------------------------------------------------------------
+app.get('/couponcode', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.couponcode.in/doelashes/' 
+    await page.goto(targetUrl)
+    const ids = await page.$$eval('.media-body .get-code', el => el.map(id => id.getAttribute('data-id')))
+   for (const id of ids) {
+     await page.goto(`${targetUrl}?open=${id}`, {
+      waitUntil: 'networkidle0'
+     })
+     await page.click('.media-body .coupon-discount-popup')
+    
+    const elementHandle = await page.waitForSelector('.modal-dialog')
+     const coupon = elementHandle && await elementHandle.evaluate(() => {
+      const couponCode = document.querySelector('.media-body .coupon-code .show-code input')?.getAttribute('value')
+       return {
+        couponCode
+      }
+     })
+     if(coupon?.couponCode) coupons.push(coupon)
+   }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// https//couponkirin.com-------------------------------------------------------------------------------------------------------------
+app.get('/couponkirin', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.couponkirin.com/merchants/printfresh' 
+    await page.goto(targetUrl)
+    const ids = await page.$$eval('.wrapper   .btn-wrapper button', el => el.map(id => id.getAttribute('data-id')))
+    for (const id of ids) {
+      await page.goto(`${targetUrl}?couponid=${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector(`.dialog-wrap`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = document.querySelector('.code .code-box button')?.getAttribute('data-clipboard-text')
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// https//dealdrop.com-------------------------------------------------------------------------------------------------------------
+app.get('/dealdrop', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.dealdrop.com/doe-lashes?d=showCode' 
+    await page.goto(targetUrl)
+    const coupons = await page.$$eval('.justify-between.flex-col div button', el => el.map(code => (code as HTMLElement)?.innerText))
+    console.log("🚀 ~ file: app.ts:551 ~ app.get ~ coupons:", coupons)
+    //  await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
 
 
 export default app
