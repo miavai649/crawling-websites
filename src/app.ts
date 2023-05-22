@@ -810,5 +810,30 @@ app.get('/promopro', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//savingarena.com-------------------------------------------------------------------------------------------------------------
+app.get('/savingarena', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.savingarena.com/doe-lashes-coupon-codes' 
+    await page.goto(targetUrl)
+    const codes = await page.$$eval('.couponbox .curve-btn .codeletters', el => el.map(code => (code as HTMLElement)?.innerText))
+    const filterCodes = codes.map(c => c.split(':')[1])
+     console.log("🚀 ~ file: app.ts:830 ~ app.get ~ filterCodes:", filterCodes)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
