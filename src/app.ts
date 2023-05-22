@@ -723,5 +723,43 @@ app.get('/moneysaveme', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//offers.com-------------------------------------------------------------------------------------------------------------
+app.get('/offers', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.offers.com/stores/printfresh/' 
+    await page.goto(targetUrl)
+    const ids = await page.$$eval('.offer-strip-container .offerstrip', el => el.map(id => id.getAttribute('data-offer-id')))
+    for (const id of ids) {
+      await page.goto(`${targetUrl}?em=${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector(`#modal`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = document.querySelector('#offer-info .code-box #copy-code-btn')?.getAttribute("data-clipboard-text")
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
