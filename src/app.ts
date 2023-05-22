@@ -618,5 +618,45 @@ app.get('/emucoupon', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//greenpromocode.com-------------------------------------------------------------------------------------------------------------
+app.get('/greenpromocode', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.greenpromocode.com/coupons/printfresh/' 
+    // const url = 'https://www.greenpromocode.com'
+    await page.goto(targetUrl)
+    const links = await page.$$eval('.get_code_btn .go_link', el => el.map(id => id.getAttribute('view-href')))
+    const ids = links.map(id => id?.split('=')[1])
+    for (const id of ids) {
+      await page.goto(`${targetUrl}?view=${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      console.log(page.url());
+      const elementHandle = await page.waitForSelector(`.coupon_item.filter_all.filter_code`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = (document.querySelector('.get_code_btn .code.text_center') as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
