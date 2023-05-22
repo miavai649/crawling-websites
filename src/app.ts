@@ -857,10 +857,48 @@ app.get('/sociablelabs', (req: Request, res: Response, next: NextFunction) => {
         waitUntil: 'networkidle0'
       })
       // console.log(page.url());
-      // console.log('noor');
       const elementHandle = await page.waitForSelector(`#myModal`)
       const coupon = elementHandle && await elementHandle.evaluate(() => {
         const couponCode = document.querySelector('.clipboards form .form-group .input-group .input-group-addon')?.getAttribute('data-clipboard-text')
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// https//thephuketnews.com-------------------------------------------------------------------------------------------------------------
+app.get('/thephuketnews', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.thephuketnews.com/deals/doe-lashes' 
+    await page.goto(targetUrl)
+    const ids = await page.$$eval('li .coupon_wrapper.detail_filter_all.detail_filter_code  a', el => el.map(id => id.getAttribute('data-cid')))
+   
+    for (const id of ids) {
+      await page.goto(`${targetUrl}?promoid=${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector(`.coupon_detail`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = (document.querySelector('.copy_code #codeText') as HTMLElement)?.innerText
         return {
           couponCode
         }
