@@ -699,5 +699,29 @@ app.get('/hotdeals', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//moneysaveme.com-------------------------------------------------------------------------------------------------------------
+app.get('/moneysaveme', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.moneysaveme.com/store/doelashes.com' 
+    await page.goto(targetUrl)
+    const couponCodes = await page.$$eval('.showcode button', el => el.map(code => code.getAttribute('data-clipboard-text')))
+     console.log("🚀 ~ file: app.ts:718 ~ app.get ~ couponCodes:", couponCodes)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
