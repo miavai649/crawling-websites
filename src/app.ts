@@ -761,5 +761,30 @@ app.get('/offers', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//prmdeal.com-------------------------------------------------------------------------------------------------------------
+app.get('/prmdeal', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.prmdeal.com/coupon-codes/doe-lashes-free-shipping-code/' 
+    await page.goto(targetUrl)
+    const codes = await page.$$eval('.main_rcon1.each_ul .the_coupon_data', el => el.map(code => code.getAttribute('att_code')))
+    const filterCode = codes.filter(c => c !== '')
+     console.log("🚀 ~ file: app.ts:781 ~ app.get ~ filterCode:", filterCode)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
