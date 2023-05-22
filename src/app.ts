@@ -658,5 +658,46 @@ app.get('/greenpromocode', (req: Request, res: Response, next: NextFunction) => 
   res.send('Hello World!')
 })
 
+// https//hotdeals.com-------------------------------------------------------------------------------------------------------------
+app.get('/hotdeals', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.hotdeals.com/coupons/doux-lashes-coupon' 
+    await page.goto(targetUrl)
+    const links = await page.$$eval('.list div', el => el.map(id => id.getAttribute('data-href')))
+    const filterLinks = links.filter(l => l !== null)
+    const ids = filterLinks.map(i => i?.split('?')[0])
+    const finalIds = ids.map(id => id?.split('/')[2])
+    for (const id of finalIds) {
+      await page.goto(`${targetUrl}?popcid=${id}&ads=1`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector(`.dialog-hascoupert-hascode`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = (document.querySelector('.copy-attach .code-box .code') as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
