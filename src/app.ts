@@ -549,7 +549,31 @@ app.get('/dealdrop', (req: Request, res: Response, next: NextFunction) => {
     await page.goto(targetUrl)
     const coupons = await page.$$eval('.justify-between.flex-col div button', el => el.map(code => (code as HTMLElement)?.innerText))
     console.log("🚀 ~ file: app.ts:551 ~ app.get ~ coupons:", coupons)
-    //  await browser.close()
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// https//discountreactor.com-------------------------------------------------------------------------------------------------------------
+app.get('/discountreactor', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.discountreactor.com/coupons/doelashes.com' 
+    await page.goto(targetUrl)
+   const codes = await page.$$eval('.offer-list-item-right .offer-list-item-title-section .offer-list-item-button-content a .offer-list-item-button_hidden-code', el => el.map(code => code.getAttribute('data-code')))
+     console.log("🚀 ~ file: app.ts:575 ~ app.get ~ codes:", codes)
+     await browser.close()
     console.log(`All done, check the result. ✨`)
   })
 
