@@ -913,5 +913,37 @@ app.get('/thephuketnews', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//wethrift.com-------------------------------------------------------------------------------------------------------------
+app.get('/wethrift', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : string[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.wethrift.com/doe-lashes-' 
+    await page.goto(targetUrl)
+    await page.click('.css-1lmlji8 div button')
+    const pages = await browser.pages()
+    await page.goto(pages[2].url())
+    // console.log(page.url());
+    const elementHandle = await page.waitForSelector('.css-3dryow')
+    const coupon = elementHandle && await page.$$eval('.css-1lmlji8 div button .css-zsgcvb', el => el.map(code => (code as HTMLElement).innerText))
+    const singleCode = await page.$eval('.css-1fc3731 .css-ct7cre .css-igmnyf', c => (c as HTMLElement).innerText)
+    // console.log("🚀 ~ file: app.ts:938 ~ app.get ~ singleCode:", singleCode)
+    coupon?.unshift(singleCode)
+    console.log("🚀 ~ file: app.ts:937 ~ app.get ~ coupon:", coupon)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
