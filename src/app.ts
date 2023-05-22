@@ -835,5 +835,45 @@ app.get('/savingarena', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//sociablelabs.com-------------------------------------------------------------------------------------------------------------
+app.get('/sociablelabs', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.sociablelabs.com/printfresh-coupons' 
+    await page.goto(targetUrl)
+    const links = await page.$$eval('.hidden-sm .reveal_btn.goto_store.show-code.top-store-button', el => el.map(l => l.getAttribute('href')))
+    // console.log("🚀 ~ file: app.ts:854 ~ app.get ~ links:", links)
+    for (const link of links) {
+      await page.goto(`${link}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      // console.log('noor');
+      const elementHandle = await page.waitForSelector(`#myModal`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = document.querySelector('.clipboards form .form-group .input-group .input-group-addon')?.getAttribute('data-clipboard-text')
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
