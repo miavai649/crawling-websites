@@ -945,5 +945,48 @@ app.get('/wethrift', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//retailmenot.com-------------------------------------------------------------------------------------------------------------
+app.get('/retailmenot', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.retailmenot.com/' 
+    const url = 'https://www.retailmenot.com'
+    await page.goto(targetUrl)
+    const linkObj = await page.$$eval('.relative .block', el => el.map(li => li.getAttribute('x-data')))
+    const filterLink = linkObj.filter(li => li !== null)
+    const links = filterLink.map(li => li?.split(' ')[1])
+    const finalLink = links.map(li => li?.replace(/\'|,$/g, ""))
+    for (const link of finalLink) {
+      await page.goto(`${url}${link}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector(".Modal__StyledModal-sc-1av73vo-1")
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = (document.querySelector('.CopyCode__StyledCopyCode-sc-10h0ylz-0.bOHBoy .CopyCode__Content-sc-10h0ylz-1 .CopyCode__Code-sc-10h0ylz-2.cVSRcS') as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+      // console.log(coupon);
+      if (coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
