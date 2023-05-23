@@ -1012,5 +1012,47 @@ app.get('/rakuten', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// https//dealscove.com-------------------------------------------------------------------------------------------------------------
+app.get('/dealscove', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.dealscove.com/coupons/paradisefibers.com' 
+    const url = 'https://www.dealscove.com/'
+    await page.goto(targetUrl)
+    const codesLinks = await page.$$eval('.coupon_info ul .coupon_detail .overs.c_title', el => el.map(li => li.getAttribute("onclick")))
+    const removePunc  = codesLinks.map(li => li?.replace(/[\(\)'";]/g, ''))
+    const finalLinks = removePunc.map(li => li?.split('code')[1])
+    const filterLinks = finalLinks.filter(li => li !== undefined)
+    for (const link of filterLinks) {
+      await page.goto(`${url}/show-code/?go-data=${link}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector('.cont')
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = (document.querySelector(".code_box .code_num #popcode") as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
