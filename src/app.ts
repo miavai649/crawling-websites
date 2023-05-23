@@ -9,7 +9,7 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// http://wativ.com
+// no.1  http://wativ.com 
 app.get('/wativ', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
 
@@ -33,7 +33,7 @@ app.get('/wativ', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https://brokescholar
+// no.2 https://brokescholar
 app.get('/brokescholar', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -73,7 +73,7 @@ app.get('/brokescholar', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//couponcause.com
+// no.3 https//couponcause.com
 app.get('/couponcause', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
 
@@ -96,7 +96,73 @@ app.get('/couponcause', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//coupontoaster.com
+// no.4 https//coupons.slickdeals.com
+app.get('/coupons.slickdeals', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://coupons.slickdeals.net/' 
+    await page.goto(targetUrl)
+    const links = await page.$$eval('.bp-c-card_content .bp-c-card_imageContainer.bp-c-link', el => el.map(link => link.getAttribute("href")))
+    const couponIdLinks = links.filter(l => l?.split('?').length === 2)
+    for (const link of couponIdLinks) {
+      await page.goto(`${link}`, {
+        waitUntil: 'networkidle0'
+      })
+      const elementHandle = await page.waitForSelector(`.bp-c-popup`)
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const element = document.querySelector('.bp-c-popup_content .bp-p-storeCouponModal_codeBlock .bp-p-storeCouponModal_code')
+        const couponCode = (element as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+      if(coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
+    await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// no.5 https//couponseeker.com
+app.get('/couponseeker', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://couponseeker.com/doe-lashes-promo-codes/' 
+    await page.goto(targetUrl)
+    await page.click('.input-code .right-0 .code')
+    const pages = await browser.pages()
+    await page.goto(pages[2].url())
+    const codes = await page.$$eval('.mt-4 .input-code input', el => el.map(code=> code.value))
+    const cupons = codes.filter(c => c !== '')
+    console.log("🚀 ~ file: app.ts:200 ~ app.get ~ cupons:", cupons)
+    await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// no.6 https//coupontoaster.com
 app.get('/coupontoaster', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -138,73 +204,11 @@ if(coupon?.couponCode) coupons.push(coupon)
   res.send('Hello World!')
 })
 
-// https//coupons.slickdeals.com
-app.get('/coupons.slickdeals', (req: Request, res: Response, next: NextFunction) => {
-  puppeteer.use(StealthPlugin())
-  const coupons : object[] = [];
-  // puppeteer usage as normal
-  puppeteer.launch({
-    headless: false,
-    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
-  }).then(async browser => {
-    console.log('Running tests..')
-    const page = await browser.newPage()
-    page.setDefaultNavigationTimeout(20 * 60 * 1000)
-    const targetUrl = 'https://coupons.slickdeals.net/' 
-    await page.goto(targetUrl)
-    const links = await page.$$eval('.bp-c-card_content .bp-c-card_imageContainer.bp-c-link', el => el.map(link => link.getAttribute("href")))
-    const couponIdLinks = links.filter(l => l?.split('?').length === 2)
-    for (const link of couponIdLinks) {
-      await page.goto(`${link}`, {
-        waitUntil: 'networkidle0'
-      })
-      const elementHandle = await page.waitForSelector(`.bp-c-popup`)
-      const coupon = elementHandle && await elementHandle.evaluate(() => {
-        const element = document.querySelector('.bp-c-popup_content .bp-p-storeCouponModal_codeBlock .bp-p-storeCouponModal_code')
-        const couponCode = (element as HTMLElement)?.innerText
-        return {
-          couponCode
-        }
-      })
-      if(coupon?.couponCode) coupons.push(coupon)
-    }
-    console.log(coupons);
-    await browser.close()
-    console.log(`All done, check the result. ✨`)
-  })
 
-  res.send('Hello World!')
-})
 
-// https//couponseeker.com
-app.get('/couponseeker', (req: Request, res: Response, next: NextFunction) => {
-  puppeteer.use(StealthPlugin())
-  // puppeteer usage as normal
-  puppeteer.launch({
-    headless: false,
-    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
-  }).then(async browser => {
-    console.log('Running tests..')
-    const page = await browser.newPage()
-    page.setDefaultNavigationTimeout(20 * 60 * 1000)
-    const targetUrl = 'https://couponseeker.com/doe-lashes-promo-codes/' 
-    await page.goto(targetUrl)
-    await page.click('.input-code .right-0 .code')
-    const pages = await browser.pages()
-    await page.goto(pages[2].url())
-    const codes = await page.$$eval('.mt-4 .input-code input', el => el.map(code=> code.value))
-    const cupons = codes.filter(c => c !== '')
-    console.log("🚀 ~ file: app.ts:200 ~ app.get ~ cupons:", cupons)
-    await browser.close()
-    console.log(`All done, check the result. ✨`)
-  })
 
-  res.send('Hello World!')
-})
 
-// https//deala.com-------------------------------------------------------------------------------------------------------------------
+// no.7 https//deala.com-------------------------------------------------------------------------------------------------------------------
 app.get('/deala', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   // puppeteer usage as normal
@@ -220,11 +224,34 @@ app.get('/deala', (req: Request, res: Response, next: NextFunction) => {
     await page.goto(targetUrl)
     await page.click('.btn-wrapper button')
     const pages = await browser.pages()
-    // await page.goto(pages[2].url())
+    await page.goto(pages[0].url())
+    console.log(page.url());
     // const codes = await page.$$eval('.scroll-content .code-wrapper .code', el => el.map(code => (code as HTMLElement)?.innerText))
     // console.log("🚀 ~ file: app.ts:223 ~ app.get ~ codes:", codes)
     // await browser.close()
-    console.log(page.url());
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// no.8 https//dealrated.com-------------------------------------------------------------------------------------------------------------------
+app.get('/dealrated', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://dealrated.com/store/doe-lashes' 
+    await page.goto(targetUrl)
+    const codes = await page.$$eval('.row.coupon-row .desktop-btn .coupon-button', el => el.map(code => code.getAttribute('coupon')))
+    console.log("🚀 ~ file: app.ts:253 ~ app.get ~ codes:", codes)
+    await browser.close()
     console.log(`All done, check the result. ✨`)
   })
 
