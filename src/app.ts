@@ -1219,5 +1219,30 @@ app.get('/clothingrac', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// no.39 https//ultimatecoupons.com-------------------------------------------------------------------------------------------------------------
+app.get('/ultimatecoupons', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.ultimatecoupons.com/coupons/paradise_fibers_coupons.htm' 
+    await page.goto(targetUrl)
+    const codes = await page.$$eval('.offer-list.merchant li', el => el.map(code => code.getAttribute('data-offer-code')))
+    const filterCode = codes.filter(c => c !== '')
+     console.log("🚀 ~ file: app.ts:1239 ~ app.get ~ filterCode:", filterCode)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
