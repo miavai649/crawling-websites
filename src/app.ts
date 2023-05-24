@@ -258,7 +258,7 @@ app.get('/dealrated', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//dealspotr.com
+// n0.9 https//dealspotr.com
 app.get('/dealspotr', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   // puppeteer usage as normal
@@ -281,7 +281,7 @@ app.get('/dealspotr', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//epicsavers.com
+// no.10 https//epicsavers.com
 app.get('/epicsavers', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   // puppeteer usage as normal
@@ -305,7 +305,7 @@ app.get('/epicsavers', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//givingassistant.com---------------------------------------------------------------------------------------------------------
+// no.11 https//givingassistant.com---------------------------------------------------------------------------------------------------------
 app.get('/givingassistant', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   // puppeteer usage as normal
@@ -319,18 +319,29 @@ app.get('/givingassistant', (req: Request, res: Response, next: NextFunction) =>
     page.setDefaultNavigationTimeout(20 * 60 * 1000)
     const targetUrl = 'https://givingassistant.org/coupon-codes/paradisefibers.com' 
     await page.goto(targetUrl)
-    await page.click('.b2qzd24 button')
-    console.log(page.url());
-    // const pages = await browser.pages()
-    // await page.goto(pages[1].url())
-    // await browser.close()
+    const buttons = await page.$$('.c1j1ont7 .c1b9k5e2 .b2qzd24 button')
+    // console.log("🚀 ~ file: app.ts:323 ~ app.get ~ buttons:", buttons)
+    for (let i = 0; i < buttons.length; i++) {
+      const button = buttons[i];
+
+      await button.click();
+      
+    }
+    const pages = await browser.pages()
+    await page.goto(pages[1].url())
+    // console.log(page.url());
+    await page.waitForSelector('.subscribe')
+    const codes = await page.$$eval('.ct0nlwf .c136lbfo input', el => el.map(code => code.getAttribute('value')))
+    console.log("🚀 ~ file: app.ts:325 ~ app.get ~ codes:", codes)
+    
+    await browser.close()
     console.log(`All done, check the result. ✨`)
   })
 
   res.send('Hello World!')
 })
 
-// https//gogetdeals.com
+// no.12 https//gogetdeals.com
 app.get('/gogetdeals', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   // puppeteer usage as normal
@@ -354,7 +365,7 @@ app.get('/gogetdeals', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//printfresh.knoji.com
+// no.13 https//printfresh.knoji.com
 app.get('/printfresh.knoji', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : string[] = [];
@@ -390,7 +401,7 @@ app.get('/printfresh.knoji', (req: Request, res: Response, next: NextFunction) =
   res.send('Hello World!')
 })
 
-// https//refermatei.com
+// no.14 https//refermatei.com
 app.get('/refermate', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : string[] = [];
@@ -415,7 +426,7 @@ app.get('/refermate', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//couponbirds.com
+// no.15 https//couponbirds.com
 app.get('/couponbirds', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -452,7 +463,7 @@ app.get('/couponbirds', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//couponchief.com-------------------------------------------------------------------------------------------------------------
+// no.16 https//couponchief.com-------------------------------------------------------------------------------------------------------------
 app.get('/couponchief', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -482,7 +493,7 @@ app.get('/couponchief', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//couponcode.com-------------------------------------------------------------------------------------------------------------
+// no.17 https//couponcode.com-------------------------------------------------------------------------------------------------------------
 app.get('/couponcode', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -498,12 +509,14 @@ app.get('/couponcode', (req: Request, res: Response, next: NextFunction) => {
     const targetUrl = 'https://www.couponcode.in/doelashes/' 
     await page.goto(targetUrl)
     const ids = await page.$$eval('.media-body .get-code', el => el.map(id => id.getAttribute('data-id')))
-   for (const id of ids) {
-     await page.goto(`${targetUrl}?open=${id}`, {
-      waitUntil: 'networkidle0'
-     })
-     await page.click('.media-body .coupon-discount-popup')
-    
+    for (const id of ids) {
+      await page.goto(`${targetUrl}?open=${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      
+      await page.click('.media-body .coupon-discount-popup')
+      
+      console.log(page.url());
     const elementHandle = await page.waitForSelector('.modal-dialog')
      const coupon = elementHandle && await elementHandle.evaluate(() => {
       const couponCode = document.querySelector('.media-body .coupon-code .show-code input')?.getAttribute('value')
@@ -521,7 +534,7 @@ app.get('/couponcode', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//couponkirin.com-------------------------------------------------------------------------------------------------------------
+// no.18 https//couponkirin.com-------------------------------------------------------------------------------------------------------------
 app.get('/couponkirin', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -559,7 +572,7 @@ app.get('/couponkirin', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//dealdrop.com-------------------------------------------------------------------------------------------------------------
+// no.19 https//dealdrop.com-------------------------------------------------------------------------------------------------------------
 app.get('/dealdrop', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -583,7 +596,7 @@ app.get('/dealdrop', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// https//discountreactor.com-------------------------------------------------------------------------------------------------------------
+// no.20 https//discountreactor.com-------------------------------------------------------------------------------------------------------------
 app.get('/discountreactor', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -600,6 +613,45 @@ app.get('/discountreactor', (req: Request, res: Response, next: NextFunction) =>
     await page.goto(targetUrl)
    const codes = await page.$$eval('.offer-list-item-right .offer-list-item-title-section .offer-list-item-button-content a .offer-list-item-button_hidden-code', el => el.map(code => code.getAttribute('data-code')))
      console.log("🚀 ~ file: app.ts:575 ~ app.get ~ codes:", codes)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// no.21 https//dontpayfull.com-------------------------------------------------------------------------------------------------------------
+app.get('/dontpayfull', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.dontpayfull.com/at/printfresh.com' 
+    await page.goto(targetUrl)
+    const data_id = await page.$$eval('#active-coupons li', el => el.map(d => d.getAttribute('data-id')))
+    const filterDataId = data_id.filter(d => d !== null)
+    for (const id of filterDataId) {
+      await page.goto(`${targetUrl}?c=${id}#c${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector('.floating-box-content')
+      const coupon = elementHandle && await elementHandle.evaluate(() => {
+        const couponCode = (document.querySelector('.offer-code .code-box h2') as HTMLElement)?.innerText
+        return {
+          couponCode
+        }
+      })
+      if (coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
      await browser.close()
     console.log(`All done, check the result. ✨`)
   })
