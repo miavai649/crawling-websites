@@ -1244,5 +1244,29 @@ app.get('/ultimatecoupons', (req: Request, res: Response, next: NextFunction) =>
   res.send('Hello World!')
 })
 
+// no.40 https//ozsavingspro.com-------------------------------------------------------------------------------------------------------------
+app.get('/ozsavingspro', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.ozsavingspro.com/store/paradisefibers.com' 
+    await page.goto(targetUrl)
+    const codes = await page.$$eval('.coupon-button-code button .btn-coupon-code', el => el.map(code => (code as HTMLElement)?.innerText))
+     console.log("🚀 ~ file: app.ts:1263 ~ app.get ~ codes:", codes)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
