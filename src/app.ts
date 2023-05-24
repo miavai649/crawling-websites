@@ -1195,5 +1195,29 @@ app.get('/fyvor', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
+// no.38 https//clothingrac.com-------------------------------------------------------------------------------------------------------------
+app.get('/clothingrac', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.clothingrac.com/coupon/paradisefibers.com' 
+    await page.goto(targetUrl)
+    const codes = await page.$$eval('.couponbox .coupons_btn a span', el => el.map(code => (code as HTMLElement)?.innerText))
+     console.log("🚀 ~ file: app.ts:1214 ~ app.get ~ codes:", codes)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
 
 export default app
