@@ -1133,7 +1133,7 @@ app.get('/dealscove', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!')
 })
 
-// no.35 https//save.reviews.com-------------------------------------------------------------------------------------------------------------
+// no.36 https//save.reviews.com-------------------------------------------------------------------------------------------------------------
 app.get('/save.reviews', (req: Request, res: Response, next: NextFunction) => {
   puppeteer.use(StealthPlugin())
   const coupons : object[] = [];
@@ -1150,6 +1150,44 @@ app.get('/save.reviews', (req: Request, res: Response, next: NextFunction) => {
     await page.goto(targetUrl)
     const codes = await page.$$eval('.discountbox .discountbox-main .moredetail-main .getcode-btn .button-text', el => el.map(code => code.getAttribute('data-code')))
      console.log("🚀 ~ file: app.ts:1152 ~ app.get ~ codes:", codes)
+     await browser.close()
+    console.log(`All done, check the result. ✨`)
+  })
+
+  res.send('Hello World!')
+})
+
+// no.37 https//fyvor.com-------------------------------------------------------------------------------------------------------------
+app.get('/fyvor', (req: Request, res: Response, next: NextFunction) => {
+  puppeteer.use(StealthPlugin())
+  const coupons : object[] = [];
+  // puppeteer usage as normal
+  puppeteer.launch({
+    headless: false,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    userDataDir: 'C:/Users/mahmu/AppData/Local/Google/Chrome/User Data/Default'
+  }).then(async browser => {
+    console.log('Running tests..')
+    const page = await browser.newPage()
+    page.setDefaultNavigationTimeout(20 * 60 * 1000)
+    const targetUrl = 'https://www.fyvor.com/coupons/paradise-fibers/' 
+    await page.goto(targetUrl)
+    const ids = await page.$$eval('.coupon_infor .ds_content .ds_cou_right .btn a', el => el.map(code => code.getAttribute('data-cid')))
+    for (const id of ids) {
+      await page.goto(`${targetUrl}?promoid=${id}`, {
+        waitUntil: 'networkidle0'
+      })
+      // console.log(page.url());
+      const elementHandle = await page.waitForSelector('#votedialog')
+      const coupon = elementHandle && await page.evaluate(() => {
+        const couponCode = document.querySelector('#couponcode_dialog #copy')?.getAttribute('data-clipboard-text')
+        return {
+          couponCode
+        }
+      })
+      if (coupon?.couponCode) coupons.push(coupon)
+    }
+    console.log(coupons);
      await browser.close()
     console.log(`All done, check the result. ✨`)
   })
