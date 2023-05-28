@@ -791,7 +791,7 @@ app.get('/moneysaveme', (req: Request, res: Response, next: NextFunction) => {
     console.log('Running tests..')
     const page = await browser.newPage()
     page.setDefaultNavigationTimeout(20 * 60 * 1000)
-    const targetUrl = 'https://www.moneysaveme.com/store/doelashes.com' 
+    const targetUrl = 'https://www.moneysaveme.com/store/hosstile.myshopify.com' 
     await page.goto(targetUrl)
     const couponCodes = await page.$$eval('.showcode button', el => el.map(code => code.getAttribute('data-clipboard-text')))
      console.log("🚀 ~ file: app.ts:718 ~ app.get ~ couponCodes:", couponCodes)
