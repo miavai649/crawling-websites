@@ -9,7 +9,9 @@ export const GetAllPlan = async (req: Request, res: Response, next: NextFunction
     const { page, shopId } = req.query
     console.log({shopId});
     const limit = 10
-    const query: any = {}
+    const query: any = {
+      isActive: true
+    }
     if(shopId) query._id = new mongoose.Types.ObjectId(shopId)
 
     // console.log({page, skip: (Number(page)-1)*limit})
@@ -56,7 +58,9 @@ export const GetAllPlan = async (req: Request, res: Response, next: NextFunction
     //   $sort: { createdAt: -1 }
     // })
     
-    const count = await Plan.countDocuments()
+    const count = await Plan.countDocuments({
+      isActive: true
+    })
     res.status(200).json({
       result: data,
       totalPages: Math.ceil(count / limit),
