@@ -7,7 +7,6 @@ import { Schema } from 'mongoose'
 export const GetAllPlan = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { page, shopId } = req.query
-    console.log({shopId});
     const limit = 10
     const query: any = {
       isActive: true
